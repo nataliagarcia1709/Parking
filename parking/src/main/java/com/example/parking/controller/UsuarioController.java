@@ -34,13 +34,10 @@ public class UsuarioController {
 
     @PostMapping(path= "",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registrarUsuario(@Valid @RequestBody UsuarioDto usuarioDto) {
-        Usuario usuario = usuarioService.registrarUsuario(
-                usuarioDto.getEmail(),
-                usuarioDto.getPassword()
-        );
+        Usuario usuario = usuarioService.registrarUsuario(usuarioDto);
         UsuarioMapper usuarioMapper = new UsuarioMapper();
         UsuarioDto registrarUsuarioDto = usuarioMapper.entityToDTO(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(registrarUsuarioDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body("El usuario fue registrado con exito" + registrarUsuarioDto);
     }
 
     //Mostrar todos los usuarios
@@ -65,14 +62,11 @@ public class UsuarioController {
         usuarioService.eliminarUsuario(id);
         return ResponseEntity.ok("Parqueadero eliminado exitosamente");
     }
-
-    /*//Asignar usuario a un parqueadero
-    @PostMapping(path="/asignar/{userId}/{parqueaderoId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> asignarUsuarioAParqueadero(
-            @PathVariable Long userId,
-            @PathVariable Long parqueaderoId
-    ) {
-        usuarioService.asignarUsuarioAParqueadero(userId, parqueaderoId);
-        return ResponseEntity.ok("Usuario asignado al parqueadero exitosamente");
-    }*/
+    @PostMapping("/{idUsuario}/parqueadero/{idParqueadero}")
+    public ResponseEntity<String> asignarParqueaderoASocio(
+            @PathVariable Long idUsuario,
+            @PathVariable Long idParqueadero) {
+        usuarioService.asignarParqueaderoASocio(idUsuario, idParqueadero);
+        return ResponseEntity.ok("Parqueadero asignado exitosamente al usuario.");
+    }
 }

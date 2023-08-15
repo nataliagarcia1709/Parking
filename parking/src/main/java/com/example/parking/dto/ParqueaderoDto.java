@@ -9,8 +9,12 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class ParqueaderoDto {
+
+    Long id;
 
     @NotBlank(message = "nombre es requerido")
     private String nombre;

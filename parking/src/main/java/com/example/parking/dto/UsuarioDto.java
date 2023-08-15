@@ -1,20 +1,20 @@
 package com.example.parking.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class UsuarioDto {
+    private Long id;
 
-    @NotNull
     @NotBlank(message = "email es requerido")
     private String email;
 
-    @NotNull
     @NotBlank(message = "contraseña es requerida")
     private String password;
 }

@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegistroParqueo {
+public class Historial {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,10 +26,10 @@ public class RegistroParqueo {
     @JoinColumn(name = "vehiculo_id")
     private Vehiculo vehiculo;
 
-    @CreationTimestamp
     @Column(name= "fecha_ingreso")
     private LocalDateTime fechaHoraIngreso;
 
+    @CreationTimestamp
+    @Column(name= "fecha_salida")
     private LocalDateTime fechaHoraSalida;
 }
-

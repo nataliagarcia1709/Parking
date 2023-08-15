@@ -29,15 +29,11 @@ public class ParqueaderoController {
     }
 
     @PostMapping(path = "",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ParqueaderoDto> crearParqueadero(@RequestBody @Valid ParqueaderoDto parqueaderoDto) {
-        Parqueadero parqueadero = parqueaderoService.crearParqueadero(
-                parqueaderoDto.getNombre(),
-                parqueaderoDto.getCapacidad(),
-                parqueaderoDto.getCostoHora()
-        );
+    public ResponseEntity<?> crearParqueadero(@RequestBody @Valid ParqueaderoDto parqueaderoDto) {
+        Parqueadero parqueadero = parqueaderoService.crearParqueadero(parqueaderoDto);
         ParqueaderoMapper parqueaderoMapper = new ParqueaderoMapper();
         ParqueaderoDto crearParqueaderoDto = parqueaderoMapper.toDTO(parqueadero);
-        return ResponseEntity.status(HttpStatus.CREATED).body(crearParqueaderoDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(parqueaderoDto.getNombre());
     }
 
     @DeleteMapping("/{id}")
@@ -45,16 +41,21 @@ public class ParqueaderoController {
         parqueaderoService.eliminarParqueadero(id);
         return ResponseEntity.ok("Parqueadero eliminado exitosamente");
     }
+    @PutMapping("{id}")
+    public ResponseEntity<String> actualizarParqueadero(@PathVariable Long id, @Valid @RequestBody ParqueaderoDto parqueaderoDto) {
+        parqueaderoService.modificarParqueadero(id, parqueaderoDto);
+        return ResponseEntity.ok("Parqueadero actualizado exitosamente");
+    }
 
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<Parqueadero> listarParqueaderos(){
+    public List<ParqueaderoDto> listarParqueaderos(){
         return parqueaderoService.obtenerParqueaderos();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Parqueadero> obtenerParqueaderoPorId(@PathVariable Long id) {
-        Parqueadero parqueadero = parqueaderoService.buscarId(id);
+    public ResponseEntity<ParqueaderoDto> obtenerParqueaderoPorId(@PathVariable Long id) {
+        ParqueaderoDto parqueadero = parqueaderoService.buscarId(id);
         if (parqueadero != null) {
             return new ResponseEntity<>(parqueadero, HttpStatus.OK);
         } else {
@@ -62,11 +63,5 @@ public class ParqueaderoController {
         }
     }
 
-  /*@PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-       public ResponseEntity<ParqueaderoDto> modificarParqueadero(@PathVariable Long id, @RequestBody ParqueaderoDto parqueaderoDto) {
-        Parqueadero actualizarParqueadero = parqueaderoService.modificarParqueadero(id, parqueaderoDto);
-        ParqueaderoDto actualizarParqueaderoDTO = parqueaderoMapper.toDTO(actualizarParqueadero);
-        return ResponseEntity.ok(actualizarParqueaderoDTO);
-    }*/
 
 }

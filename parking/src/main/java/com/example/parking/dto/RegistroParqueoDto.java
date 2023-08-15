@@ -12,6 +12,7 @@ import lombok.*;
 @Builder
 public class RegistroParqueoDto {
 
+    Long id;
 
     @NotNull
     private Long idPark;

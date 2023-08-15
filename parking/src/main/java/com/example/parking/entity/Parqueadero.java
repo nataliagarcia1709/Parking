@@ -14,7 +14,9 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Parqueadero {
 
     @Id
@@ -22,7 +24,7 @@ public class Parqueadero {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "nombre")
+    @Column(name = "nombre",unique = true)
     private String nombre;
 
     @Column(name= "capacidad")
@@ -34,7 +36,6 @@ public class Parqueadero {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
-
 
 
 }

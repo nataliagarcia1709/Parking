@@ -9,7 +9,9 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Vehiculo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +25,5 @@ public class Vehiculo {
     @OneToMany(mappedBy = "vehiculo")
     private List<RegistroParqueo> registros;
 
-
-
+    private Long vecesRegistrado;
 }

@@ -2,37 +2,42 @@ package com.example.parking.service;
 
 import com.example.parking.dto.ParqueaderoDto;
 import com.example.parking.entity.Parqueadero;
+import com.example.parking.entity.Usuario;
+import com.example.parking.entity.Vehiculo;
 import com.example.parking.exception.NoSuchElementFoundException;
+import com.example.parking.mapper.ParqueaderoMapper;
 import com.example.parking.repository.ParqueaderoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ParqueaderoService {
     private final ParqueaderoRepository parqueaderoRepository;
     private final UsuarioService usuarioService;
+    private ParqueaderoMapper parqueaderoMapper;
 
     @Autowired
-    public ParqueaderoService(ParqueaderoRepository parqueaderoRepository,UsuarioService usuarioService) {
+    public ParqueaderoService(ParqueaderoRepository parqueaderoRepository,UsuarioService usuarioService, ParqueaderoMapper parqueaderoMapper) {
         this.parqueaderoRepository = parqueaderoRepository;
         this.usuarioService = usuarioService;
+        this.parqueaderoMapper = parqueaderoMapper;
     }
 
     //Método para crear el parqueadero
-    public Parqueadero crearParqueadero(String nombre, int capacidad, float costoHora)  throws NoSuchElementFoundException {
+    public Parqueadero crearParqueadero(ParqueaderoDto parqueaderoDto)  throws NoSuchElementFoundException {
+
         Parqueadero parqueadero = new Parqueadero();
-        parqueadero.setNombre(nombre);
-        parqueadero.setCapacidad(capacidad);
-        parqueadero.setCostoHora(costoHora);
+        parqueadero.setNombre(parqueaderoDto.getNombre());
+        parqueadero.setCapacidad(parqueaderoDto.getCapacidad());
+        parqueadero.setCostoHora(parqueaderoDto.getCostoHora());
 
-        if(false) {
-            throw new NoSuchElementFoundException("Guardado exitosamente");
-        }
-
+        parqueaderoDto.setId(parqueadero.getId());
         return parqueaderoRepository.save(parqueadero);
     }
+
 
     //Método para eliminar el parqueadero
     public void eliminarParqueadero(Long id) {
@@ -40,28 +45,59 @@ public class ParqueaderoService {
     }
 
     //Método para modificar parqueadero
-   public void modificarParqueadero(Long id, ParqueaderoDto parqueaderoDto) {
+    public void modificarParqueadero(Long id, ParqueaderoDto parqueaderoDto) {
+        ParqueaderoDto parqueaderoExistenteDto = buscarId(id);
 
-        Parqueadero parqueadero = buscarId(id);
+        if (parqueaderoExistenteDto != null) {
+            parqueaderoExistenteDto.setNombre(parqueaderoDto.getNombre());
+            parqueaderoExistenteDto.setCapacidad(parqueaderoDto.getCapacidad());
+            parqueaderoExistenteDto.setCostoHora(parqueaderoDto.getCostoHora());
 
-        if(parqueadero!=null) {
-            parqueadero.setNombre(parqueaderoDto.getNombre());
-            parqueadero.setCapacidad(parqueaderoDto.getCapacidad());
-            parqueadero.setCostoHora(parqueaderoDto.getCostoHora());
-            parqueaderoRepository.save(parqueadero);
+            // Mapear DTO actualizado a entidad
+            Parqueadero parqueaderoExistente = parqueaderoMapper.toEntity(parqueaderoExistenteDto);
+
+            // Guardar la entidad actualizada en el repositorio
+            parqueaderoRepository.save(parqueaderoExistente);
         }
     }
 
+
     //Obtener todos los parqueaderos
-    public List<Parqueadero> obtenerParqueaderos() {
+    public List<ParqueaderoDto> obtenerParqueaderos() {
         List<Parqueadero> parqueaderos = parqueaderoRepository.findAll();
+        List<ParqueaderoDto> parqueaderosDto = new ArrayList<>();
+        for (Parqueadero parqueadero : parqueaderos) {
+            ParqueaderoDto parqueaderoDto = parqueaderoMapper.toDTO(parqueadero);
+            parqueaderosDto.add(parqueaderoDto);
+        }
+        return parqueaderosDto;
+        }
 
-        return parqueaderos;
+    //Método para buscar parqueadero por id
+    public ParqueaderoDto buscarId(Long id){
+        Parqueadero parqueadero = parqueaderoRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementFoundException("Parqueadero no encontrado"));
+
+        return parqueaderoMapper.toDTO(parqueadero);
     }
 
-    public Parqueadero buscarId(Long id){
-        return parqueaderoRepository.findById(id).orElseThrow(() -> new NoSuchElementFoundException("parqueadero no encontrado"));
+    //Listar parqueadero por socio
+    public List<ParqueaderoDto> parqueaderosPorSocio(Usuario usuario) {
+        List<Parqueadero> listParqueadero = parqueaderoRepository.findAllByUsuarioId(usuario.getId());
+        List<ParqueaderoDto> listParqueaderoDto = new ArrayList<>();
+        for (Parqueadero parqueadero : listParqueadero) {
+            ParqueaderoDto parqueaderoDTO = ParqueaderoDto
+                    .builder()
+                    .id(parqueadero.getId())
+                    .nombre(parqueadero.getNombre())
+                    .capacidad(parqueadero.getCapacidad())
+                    .costoHora(parqueadero.getCostoHora())
+                    .build();
+            listParqueaderoDto.add(parqueaderoDTO);
+        }
+        return listParqueaderoDto;
     }
 
 
-}
+
+    }
