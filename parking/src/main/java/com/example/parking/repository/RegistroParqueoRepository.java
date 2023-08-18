@@ -15,15 +15,7 @@ import java.util.Optional;
 @Repository
 public interface RegistroParqueoRepository extends JpaRepository<RegistroParqueo, Long> {
 
-    int countByParqueadero(Parqueadero parqueadero);
-/*
-    @Query("SELECT new com.example.parking.VehiculoDto(r.vehiculo.placa) FROM RegistroParqueo r")
-    List<VehiculoDto> obtenerVehiculosDto();
-
-    @Query("SELECT new com.example.parking.VehiculoDto(r.vehiculo.placa) FROM RegistroParqueo r WHERE r.vehiculo.placa = :placa")
-    List<VehiculoDto> findByPlaca(@Param("placa") String placa);
-*/
-    Optional<RegistroParqueo> findByVehiculoAndFechaHoraSalidaIsNull(Vehiculo vehiculo);
+    RegistroParqueo findByVehiculo(Vehiculo vehiculo);
 
     // Consulta para obtener los 10 vehículos que más veces se han registrado en los diferentes parqueaderos y cuantas veces han sido
     @Query("SELECT rp.vehiculo.id, COUNT(rp.vehiculo.id) FROM RegistroParqueo rp GROUP BY rp.vehiculo.id ORDER BY COUNT(rp.vehiculo.id) DESC LIMIT 10")
@@ -44,6 +36,11 @@ public interface RegistroParqueoRepository extends JpaRepository<RegistroParqueo
     // Consulta para verificar de los vehículos parqueados cuales son por primera vez en ese parqueadero
     @Query("SELECT rp.vehiculo.id, COUNT(rp.vehiculo.id) FROM RegistroParqueo rp WHERE rp.parqueadero.id = :idParqueadero GROUP BY rp.vehiculo.id HAVING COUNT(rp.vehiculo.id) = 1")
     List<Vehiculo> findVehiculosRegistradosPorPrimeraVezEnParqueadero(@Param("idParqueadero") Long idParqueadero);
+
+    @Query("SELECT r.vehiculo FROM RegistroParqueo r Where r.parqueadero  = :parqueadero")
+    List<Vehiculo> findByParqueadero(Parqueadero parqueadero);
+
+
     /*
     @Query("SELECT new com.example.parking.dto.VehiculoDto(rp.vehiculo.id, COUNT(rp.vehiculo.id))" + " FROM Historial rp " + "WHERE rp.parqueadero.id = :idParqueadero" + "GROUP BY rp.vehiculo.id" + "HAVING COUNT(rp.vehiculo.id) = 1")
     List<VehiculoDto> findVehiculosRegistradosPorPrimeraVezEnParqueadero(@Param("idParqueadero") Long idParqueadero);

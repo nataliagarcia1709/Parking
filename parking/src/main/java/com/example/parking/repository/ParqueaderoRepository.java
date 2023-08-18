@@ -16,6 +16,8 @@ public interface ParqueaderoRepository extends JpaRepository<Parqueadero, Long> 
     Optional<Parqueadero> findByNombre(String registro);
 
     List<Parqueadero> findAllByUsuarioId(@Param("usuarioId") Long usuarioId);
+
+    List<Parqueadero> findAllByUsuario(Usuario usuario);
     /*@Query("SELECT p FROM Parqueadero p WHERE p.usuario.id = :usuarioId")
     List<Parqueadero> findAllByUsuarioId(@Param("usuarioId") Long usuarioId);
     */

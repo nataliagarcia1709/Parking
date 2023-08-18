@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UsuarioDto {
+
     private Long id;
 
     @NotBlank(message = "email es requerido")

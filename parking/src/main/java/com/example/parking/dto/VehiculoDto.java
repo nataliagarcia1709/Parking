@@ -10,8 +10,6 @@ import lombok.*;
 @AllArgsConstructor
 public class VehiculoDto {
 
-    private Long id;
-
     @NotBlank(message = "No puede estar vacio")
     @Size(min = 6, max = 6)
     private String placa;

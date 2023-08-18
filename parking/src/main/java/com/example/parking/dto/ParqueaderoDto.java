@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class ParqueaderoDto {
 
-    Long id;
 
     @NotBlank(message = "nombre es requerido")
     private String nombre;

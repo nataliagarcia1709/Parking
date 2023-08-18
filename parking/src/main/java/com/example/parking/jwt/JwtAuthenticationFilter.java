@@ -26,22 +26,20 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    @Autowired
-    private JwtService jwtService;
-    @Autowired
-    private UserDetailsService userDetailsService;
+
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         final String token = getTokenFromRequest(request);
-        String username = "";
+        String username;
 
         if (token == null) {
             filterChain.doFilter(request, response);
             return;
         }
-
         try {
             username = jwtService.getUsernameFromToken(token);
         } catch (ExpiredJwtException e) {
@@ -49,8 +47,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             errorException(response, HttpStatus.UNAUTHORIZED.value(), textError);
             return;
         }
-
-
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 

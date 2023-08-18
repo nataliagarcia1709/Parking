@@ -1,10 +1,14 @@
 package com.example.parking.controller;
 
-import com.example.parking.dto.RegistroParqueoDto;
-import com.example.parking.dto.VehiculoIndicadorResponse;
+import com.example.parking.dto.VehiculoDto;
+import com.example.parking.entity.Vehiculo;
+import com.example.parking.permisos.Ingreso;
+import com.example.parking.repository.HistorialRepository;
 import com.example.parking.service.RegistroParqueoService;
 import com.example.parking.service.VehiculoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,43 +18,41 @@ import java.util.List;
 @RequestMapping("/registros")
 public class RegistroParqueoController {
 
-    private RegistroParqueoService registroParqueoService;
+    private HistorialRepository historialRepository;
     private VehiculoService vehiculoService;
 
+
     @Autowired
-    public RegistroParqueoController(RegistroParqueoService registroParqueoService, VehiculoService vehiculoService){
-        this.registroParqueoService=registroParqueoService;
+    public RegistroParqueoController(HistorialRepository historialRepository, VehiculoService vehiculoService){
+        this.historialRepository = historialRepository;
         this.vehiculoService=vehiculoService;
     }
-/*
-    @PostMapping("/entrada")
-    public ResponseEntity<String> registrarEntrada(@RequestBody RegistroParqueoDto registroEntradaDTO) {
-        registroParqueoService.registrarEntrada(registroEntradaDTO);
-        return ResponseEntity.ok("Entrada registrada exitosamente");
+    @Ingreso({"SOCIO", "ADMIN"})
+    @GetMapping(path= "/vehiculos-mas-registrados", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<Object[]> obtenerTop10VehiculosMasRegistrados() {
+        List<Object[]> top10Vehiculos = historialRepository.findTop10VehiculosMasRegistrados();
+        return top10Vehiculos;
     }
 
-    @PostMapping("/salida")
-    public ResponseEntity<String> registrarSalida(@RequestBody RegistroParqueoDto registroSalidaDTO) {
-        registroParqueoService.registrarSalida(registroSalidaDTO);
-        return ResponseEntity.ok("Salida registrada exitosamente");
+    @Ingreso({"SOCIO", "ADMIN"})
+    @GetMapping(path = "/vehiculos-mas-registrados-por-parqueadero/{idParqueadero}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<Object[]> obtenerTop10VehiculosMasRegistradosPorParqueadero(@PathVariable Long idParqueadero) {
+        List<Object[]> top10VehiculosPorParqueadero = historialRepository.findTop10VehiculosMasRegistradosEnParqueadero(idParqueadero);
+        return top10VehiculosPorParqueadero;
     }
-*/
-    @GetMapping("/vehiculos-mas-registrados")
-    public ResponseEntity<List<VehiculoIndicadorResponse>> obtenerTop10VehiculosMasRegistrados() {
-        List<VehiculoIndicadorResponse> top10Vehiculos = registroParqueoService.obtenerTop10VehiculosMasRegistrados();
-        return ResponseEntity.ok(top10Vehiculos);
+    @Ingreso({"SOCIO", "ADMIN"})
+    @GetMapping(path = "/vehiculos-primera-vez/{idParqueadero}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<Vehiculo> obtenerVehiculosRegistradosPorPrimeraVezEnParqueadero(@PathVariable Long idParqueadero) {
+        return historialRepository.findVehiculosParqueadosPrimeraVezEnParqueadero(idParqueadero);
     }
-
-    @GetMapping("/vehiculos-mas-registrados-por-parqueadero/{idParqueadero}")
-    public ResponseEntity<List<VehiculoIndicadorResponse>> obtenerTop10VehiculosMasRegistradosPorParqueadero(@PathVariable Long idParqueadero) {
-        List<VehiculoIndicadorResponse> top10VehiculosPorParqueadero = registroParqueoService.obtenerTop10VehiculosMasRegistradosPorParqueadero(idParqueadero);
-        return ResponseEntity.ok(top10VehiculosPorParqueadero);
-    }
-
-    @GetMapping("/vehiculos-primera-vez/{idParqueadero}")
-    public ResponseEntity<List<VehiculoIndicadorResponse>> obtenerVehiculosRegistradosPorPrimeraVezEnParqueadero(@PathVariable Long idParqueadero) {
-        List<VehiculoIndicadorResponse> vehiculosPorPrimeraVez = registroParqueoService.obtenerVehiculosRegistradosPorPrimeraVezEnParqueadero(idParqueadero);
-        return ResponseEntity.ok(vehiculosPorPrimeraVez);
+    @Ingreso({"ADMIN", "SOCIO"})
+    @GetMapping(path = "/coincidencia", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<Vehiculo> buscarVehiculosPorCoincidencia(@RequestParam(defaultValue = "") String placa) {
+        return historialRepository.findByCoincidencia(placa);
     }
 
 }

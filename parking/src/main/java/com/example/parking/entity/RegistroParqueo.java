@@ -26,7 +26,6 @@ public class RegistroParqueo {
     private Vehiculo vehiculo;
 
     @CreationTimestamp
-    @Column(name= "fecha_ingreso")
     private LocalDateTime fechaHoraIngreso;
 
     private LocalDateTime fechaHoraSalida;

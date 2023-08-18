@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Historial {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,10 +25,9 @@ public class Historial {
     @JoinColumn(name = "vehiculo_id")
     private Vehiculo vehiculo;
 
-    @Column(name= "fecha_ingreso")
+
     private LocalDateTime fechaHoraIngreso;
 
     @CreationTimestamp
-    @Column(name= "fecha_salida")
     private LocalDateTime fechaHoraSalida;
 }

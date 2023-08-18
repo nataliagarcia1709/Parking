@@ -9,6 +9,7 @@ public class UsuarioMapper {
 
     public UsuarioDto entityToDTO(Usuario usuario) {
         UsuarioDto usuarioDto = new UsuarioDto();
+        usuarioDto.setId(usuarioDto.getId());
         usuarioDto.setEmail(usuario.getEmail());
         usuarioDto.setPassword(usuario.getPassword());
         return usuarioDto;
