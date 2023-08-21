@@ -6,6 +6,7 @@ import com.example.parking.permisos.Ingreso;
 import com.example.parking.repository.HistorialRepository;
 import com.example.parking.service.RegistroParqueoService;
 import com.example.parking.service.VehiculoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,18 +16,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/registros")
 public class RegistroParqueoController {
 
-    private HistorialRepository historialRepository;
-    private VehiculoService vehiculoService;
+    private final HistorialRepository historialRepository;
 
-
-    @Autowired
-    public RegistroParqueoController(HistorialRepository historialRepository, VehiculoService vehiculoService){
-        this.historialRepository = historialRepository;
-        this.vehiculoService=vehiculoService;
-    }
     @Ingreso({"SOCIO", "ADMIN"})
     @GetMapping(path= "/vehiculos-mas-registrados", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)

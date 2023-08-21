@@ -1,69 +1,67 @@
 package com.example.parking.controller;
 
 import com.example.parking.dto.UsuarioDto;
+import com.example.parking.dto.response.MensajeResponse;
+import com.example.parking.dto.response.RegistroResponse;
 import com.example.parking.entity.Usuario;
 import com.example.parking.permisos.Ingreso;
-import com.example.parking.repository.UsuarioRepository;
 import com.example.parking.service.UsuarioService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
-    private final UsuarioRepository usuarioRepository;
     private final UsuarioService usuarioService;
-
-    @Autowired
-    public UsuarioController(UsuarioRepository usuarioRepository, UsuarioService usuarioService) {
-        this.usuarioRepository = usuarioRepository;
-        this.usuarioService = usuarioService;
-    }
 
     @Ingreso({"ADMIN"})
     @PostMapping(path= "",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public Object registrarUsuario(@Valid @RequestBody UsuarioDto usuarioDto) {
+    public RegistroResponse registrarUsuario(@Valid @RequestBody UsuarioDto usuarioDto) {
         Usuario usuario = usuarioService.registrarUsuario(usuarioDto);
-        return new ResponseEntity<>(Map.of("Id:", usuario.getId()), HttpStatus.CREATED);
+        return new RegistroResponse(usuario.getId());
     }
 
     @Ingreso({"ADMIN"})
-    @GetMapping()
-    public ResponseEntity<List<UsuarioDto>> listarUsuarios(){
-        return new ResponseEntity<>(usuarioService.obtenerTodosLosUsuarios(), HttpStatus.OK);
+    @GetMapping(path="",produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<UsuarioDto> listarUsuarios(){
+        return usuarioService.obtenerTodosLosUsuarios();
     }
 
     @Ingreso({"ADMIN"})
-    @GetMapping("{id}")
-    public ResponseEntity<UsuarioDto> obtenerUsuarioPorId(@PathVariable Long id) {
+    @GetMapping(path="{id}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public UsuarioDto obtenerUsuarioPorId(@PathVariable Long id) {
         UsuarioDto usuario = usuarioService.obtenerUsuarioPorId(id);
         if (usuario != null) {
-            return new ResponseEntity<>(usuario, HttpStatus.OK);
+            return usuario;
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
         }
     }
+
     @Ingreso({"ADMIN"})
-    @DeleteMapping("{id}")
-    public Object eliminarUsuario(@PathVariable Long id) {
+    @DeleteMapping(path="{id}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public RegistroResponse eliminarUsuario(@PathVariable Long id) {
        usuarioService.eliminarUsuario(id);
-            return new ResponseEntity<>(Map.of("Id eliminado:", id), HttpStatus.OK);
+            return new RegistroResponse(id);
     }
     @Ingreso({"ADMIN"})
-    @PostMapping("/{idUsuario}/parqueadero/{idParqueadero}")
-    public Object asignarParqueaderoASocio(
-            @PathVariable Long idUsuario,
-            @PathVariable Long idParqueadero) {
+    @PostMapping(path="/{idUsuario}/parqueadero/{idParqueadero}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public MensajeResponse asignarParqueaderoASocio( @PathVariable Long idUsuario, @PathVariable Long idParqueadero) {
         usuarioService.asignarParqueaderoASocio(idUsuario, idParqueadero);
-        return ResponseEntity.ok("Parqueadero asignado exitosamente al usuario.");
+        String mensaje = "Asignado con éxito";
+        return new MensajeResponse(mensaje);
     }
 }

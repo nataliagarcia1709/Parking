@@ -42,7 +42,14 @@ public class RegistroParqueoService {
         Parqueadero parqueaderoEncontrado = parqueaderoRepository.findById(registroParqueoDto.getIdPark())
                 .orElseThrow(() -> new NoSuchElementFoundException("Parqueadero no encontrado"));
 
-       /*Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuario user = usuarioService.findByEmail(SecurityUtil.obtenerEmail());
+        // Obtener el usuario del registroParqueo
+        Usuario usuarioParqueadero = parqueaderoEncontrado.getUsuario();
+        // Comparar los usuarios usando el método equals de Usuario
+        if (!usuarioParqueadero.equals(user)) {
+            throw new UnauthorizedAccessException("El parqueadero no esta asociado");
+        }/*
+       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Usuario usuarioActual = (Usuario) authentication.getPrincipal();
         List<Parqueadero> parqueaderosAsignados = usuarioActual.getParqueadero();
         boolean idCoincide = false;
@@ -119,6 +126,8 @@ public class RegistroParqueoService {
                 .fechaHoraIngreso(registroParqueo.getFechaHoraIngreso())
                 .build();
         historialRepository.save(historial);
+        Parqueadero parqueadero= registroParqueo.getParqueadero();
+        parqueadero.setCapacidad(parqueadero.getCapacidad()+1);
         registroParqueoRepository.delete(registroParqueo);
     }
 
